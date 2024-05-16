@@ -7,9 +7,9 @@ import (
 
 func TestCountWords(t *testing.T) {
 
-	bytes := bytes.NewBufferString("use when scanning and the maximum size\n")
-	expected := 7
-	result := count(bytes)
+	bytes := bytes.NewBufferString("use when\n scanning and the \n maximum size\n")
+	expected := 3
+	result := count(bytes, true)
 
 	if result != expected {
 
