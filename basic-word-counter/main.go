@@ -28,6 +28,7 @@ func count(r io.Reader, linesFlag bool) int {
 	wc := 0
 
 	for scanner.Scan() {
+		fmt.Println(scanner.Text())
 		wc++
 	}
 
