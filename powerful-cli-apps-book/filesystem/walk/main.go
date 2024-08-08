@@ -47,7 +47,7 @@ func main() {
 		f   = os.Stdout
 		err error
 	)
-
+	// Open file for reading
 	if *logFile != "" {
 		f, err = os.OpenFile(*logFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 		if err != nil {
