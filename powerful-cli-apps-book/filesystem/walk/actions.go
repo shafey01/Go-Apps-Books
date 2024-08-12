@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
@@ -33,4 +34,62 @@ func delFile(path string, delLogger *log.Logger) error {
 	}
 	delLogger.Println(path)
 	return nil
+}
+
+func archiveFile(destDir string, root string, path string) error {
+
+	info, err := os.Stat(destDir)
+	if err != nil {
+		return err
+	}
+
+	if !info.IsDir() {
+
+		return fmt.Errorf("%s is not a directory", destDir)
+
+	}
+
+	fmt.Println(path)
+	relDir, err := filepath.Rel(root, path)
+	if err != nil {
+		return err
+	}
+	fmt.Println(relDir)
+	basePath := filepath.Base(path)
+	fmt.Printf("basePath: %s", basePath)
+	dest := fmt.Sprintf("%s.gz", basePath)
+
+	targetPath := filepath.Join(destDir, relDir, dest)
+	fmt.Printf("targetPath: %s", targetPath)
+
+	if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+		return err
+	}
+
+	out, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	in, err := os.Open(path)
+	if err != nil {
+		return err
+
+	}
+
+	defer in.Close()
+
+	zipWrite := gzip.NewWriter(out)
+	zipWrite.Name = filepath.Base(path)
+
+	if _, err := io.Copy(zipWrite, in); err != nil {
+		return err
+	}
+	if err := zipWrite.Close(); err != nil {
+		return err
+	}
+
+	return out.Close()
 }

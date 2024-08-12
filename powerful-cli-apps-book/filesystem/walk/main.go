@@ -24,11 +24,12 @@ import (
 // config struct
 
 type config struct {
-	list bool
-	ext  string
-	size int64
-	del  bool
-	wLog io.Writer
+	list    bool
+	ext     string
+	size    int64
+	del     bool
+	wLog    io.Writer
+	archive string
 }
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 	size := flag.Int64("size", 0, "File size to search")
 	del := flag.Bool("del", false, "Delete file")
 	logFile := flag.String("log", "", "Log delted files")
+	archive := flag.String("archive", "", "Archive directory")
 	flag.Parse()
 
 	// Open file for writing logs
@@ -59,11 +61,12 @@ func main() {
 
 	// instant from config struct
 	c := config{
-		list: *list,
-		ext:  *ext,
-		size: *size,
-		del:  *del,
-		wLog: f,
+		list:    *list,
+		ext:     *ext,
+		size:    *size,
+		del:     *del,
+		wLog:    f,
+		archive: *archive,
 	}
 
 	// Run function
@@ -89,6 +92,12 @@ func Run(root string, out io.Writer, cfg config) error {
 
 			if cfg.list {
 				return listFile(path, out)
+			}
+
+			if cfg.archive != "" {
+				if err := archiveFile(cfg.archive, root, path); err != nil {
+					return err
+				}
 			}
 			if cfg.del {
 				return delFile(path, delLogger)
