@@ -31,17 +31,28 @@ type statsFunc func(data []float64) float64
 func csvtofloat(r io.Reader, columns int) ([]float64, error) {
 
 	reader := csv.NewReader(r)
+	reader.ReuseRecord = true
 
 	columns--
 
-	allData, err := reader.ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("can not read file from file: %w", err)
+	// allData, err := reader.Read()
+	// if err != nil {
+	// 	return nil, fmt.Errorf("can not read file from file: %w", err)
 
-	}
+	// }
 
 	var data []float64
-	for i, row := range allData {
+	for i := 0; ; i++ {
+		// Read the file record by record
+		row, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("can't read the file %w", err)
+		}
+
 		if i == 0 {
 			continue
 		}

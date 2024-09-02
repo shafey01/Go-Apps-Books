@@ -1,0 +1,7 @@
+goos: linux
+goarch: amd64
+pkg: colStats
+cpu: Intel(R) Core(TM) i5-10200H CPU @ 2.40GHz
+BenchmarkRun-8   	      10	 377817956 ns/op	219169540 B/op	 1919403 allocs/op
+PASS
+ok  	colStats	4.160s
