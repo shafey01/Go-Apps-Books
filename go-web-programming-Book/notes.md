@@ -1,5 +1,6 @@
 // Go Web Programming Book by Sau Sheong Chang
 
+
 // Chapter 01
 > Go provides a viable alternative to existing languages and platforms for developing
 large-scale web applications. Large-scale web applications typically need to be
@@ -26,3 +27,22 @@ application.
 
 [Image]
 /home/shafey/Pictures/Screenshots/Screenshot from 2024-10-14 13-58-38.png
+
+An application: is a software program that interacts with a user and helps the user to
+perform an activity.
+
+if a program doesn’t render HTML to a user but
+instead returns data in any other format to another program, it is a web service
+
+
+HTTP is a stateless, text-based, request-response protocol that uses the
+client-server computing model.
+
+In HTTP , the client is also known as the user-agent
+and is often a web browser. The server is often called the web server.
+
+HTTP request
+1- Request-line
+2- Zero or more request headers
+3- An empty line
+4- The message body (optional)
