@@ -16,6 +16,7 @@ func NewProducts(l *log.Logger) *Products {
 }
 
 // Method serverHttp to staisfies the http.Handler
+// New Version
 func (p *Products) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// handle Get request
