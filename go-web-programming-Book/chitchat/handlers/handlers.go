@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+
 	"github.com/shafey01/Go-Apps-Books/tree/main/go-web-programming-Book/chitchat/data"
 )
 
@@ -35,8 +36,9 @@ func (p *Products) getProducts(w http.ResponseWriter, r *http.Request) {
 	// fetch data from the database
 	listProduct := data.GetProducts()
 
-
-
-
+	err := listProduct.ToJson(w)
+	if err != nil {
+		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
+	}
 
 }
