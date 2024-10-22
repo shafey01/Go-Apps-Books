@@ -18,34 +18,34 @@ type Product struct {
 }
 
 // list of Products
-type Products [] *Product
+type Products []*Product
 
-func (p *Product) ToJson(w io.Writer) error {
+func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }
 
-func GetProducts() Products{
+func GetProducts() Products {
 	return productList
 }
 
-var productList = []* Product{
+var productList = []*Product{
 	&Product{
 		ID:          1,
-				Name:        "Latte",
-				Description: "Frothy milky coffee",
-				Price:       2.45,
-				SKU:         "abc323",
-				CreatedOn:   time.Now().UTC().String(),
-				UpdatedOn:   time.Now().UTC().String(),
+		Name:        "Latte",
+		Description: "Frothy milky coffee",
+		Price:       2.45,
+		SKU:         "abc323",
+		CreatedOn:   time.Now().UTC().String(),
+		UpdatedOn:   time.Now().UTC().String(),
 	},
 
 	&Product{
 		Name:        "Espresso",
-				Description: "Short and strong coffee without milk",
-				Price:       1.99,
-				SKU:         "fjd34",
-				CreatedOn:   time.Now().UTC().String(),
-				UpdatedOn:   time.Now().UTC().String(),
+		Description: "Short and strong coffee without milk",
+		Price:       1.99,
+		SKU:         "fjd34",
+		CreatedOn:   time.Now().UTC().String(),
+		UpdatedOn:   time.Now().UTC().String(),
 	},
 }
