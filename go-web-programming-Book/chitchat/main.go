@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/shafey01/Go-Apps-Books/go-web-programming-Book/chitchat/handlers"
 )
 
 func main() {
@@ -16,6 +18,8 @@ func main() {
 
 	// Multiplexer
 	mux := http.NewServeMux()
+
+	ph := handlers.NewProducts(l)
 
 	// mux handler function
 	mux.Handle("/", ph)
