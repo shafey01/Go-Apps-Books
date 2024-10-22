@@ -24,7 +24,10 @@ func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }
-
+func (p *Products) AJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
+}
 func GetProducts() Products {
 	return productList
 }
