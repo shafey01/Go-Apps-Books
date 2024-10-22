@@ -196,3 +196,13 @@ The four data structures are:
  3. Thread : Representing a forum thread (a conversation among forum users)
  4. Post : Representing a post (a message added by a forum user) within a thread
 ![[Screenshot from 2024-10-20 17-28-32.png]]
+
+3. Receiving and processing requests
+Receiving and processing requests is the heart of any web application. Let’s recap
+what you’ve learned so far:
+A client sends a request to a URL at the server.
+The server has a multiplexer, which redirects the request to the correct handler
+to process the request.
+The handler processes the request and performs the necessary work.
+The handler calls the template engine to generate the correct HTML to send
+back to the client.
