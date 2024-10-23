@@ -16,10 +16,10 @@ func main() {
 
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
+	ph := handlers.NewProducts(l)
+
 	// Multiplexer
 	mux := http.NewServeMux()
-
-	ph := handlers.NewProducts(l)
 
 	// mux handler function
 	mux.Handle("/", ph)
