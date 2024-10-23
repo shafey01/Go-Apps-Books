@@ -17,19 +17,46 @@ type Product struct {
 	DeletedOn   string  `json:"-"`
 }
 
+// Decode data
+func (p *Product) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(p)
+}
+
 // list of Products
 type Products []*Product
 
+// Encode data
 func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }
-func (p *Products) AJSON(w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(p)
-}
+
 func GetProducts() Products {
 	return productList
+}
+
+func AddProduct(p *Product) {
+	id := getNextId()
+	p.ID = id
+
+	productList = append(productList, p)
+
+}
+
+// func UpdateProduct(id int, p *Product) error{
+
+// }
+
+// // Utilits functions
+// func findProduct(id int) error{
+
+// }
+
+func getNextId() int {
+
+	Last := productList[len(productList)-1]
+	return Last.ID + 1
 }
 
 var productList = []*Product{
