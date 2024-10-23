@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 )
@@ -16,6 +17,8 @@ type Product struct {
 	UpdatedOn   string  `json:"-"`
 	DeletedOn   string  `json:"-"`
 }
+
+var ErrProductNotFound = fmt.Errorf("Product Not Found")
 
 // Decode data
 func (p *Product) FromJSON(r io.Reader) error {
@@ -44,14 +47,27 @@ func AddProduct(p *Product) {
 
 }
 
-// func UpdateProduct(id int, p *Product) error{
+func UpdateProduct(id int, p *Product) error {
 
-// }
+	_, pos, err := findProduct(id)
 
-// // Utilits functions
-// func findProduct(id int) error{
+	if err != nil {
+		return err
+	}
+	p.ID = id
+	productList[pos] = p
+	return nil
+}
 
-// }
+// Utilits functions
+func findProduct(id int) (*Product, int, error) {
+	for i, v := range productList {
+		if v.ID == id {
+			return v, i, nil
+		}
+	}
+	return nil, -1, ErrProductNotFound
+}
 
 func getNextId() int {
 
@@ -71,6 +87,7 @@ var productList = []*Product{
 	},
 
 	&Product{
+		ID:          2,
 		Name:        "Espresso",
 		Description: "Short and strong coffee without milk",
 		Price:       1.99,
