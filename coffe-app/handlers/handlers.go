@@ -79,6 +79,14 @@ func (p Products) ValidateMiddelwareProducts(next http.Handler) http.Handler {
 			http.Error(w, "Unable to Decode data", http.StatusBadRequest)
 			return
 		}
+		err = NewProduct.Validate()
+		if err != nil {
+
+			p.l.Println("[ERROR] Validating product", err)
+			http.Error(w, "Unable to Validating data", http.StatusBadRequest)
+			return
+
+		}
 		ctx := context.WithValue(r.Context(), KeyProduct{}, NewProduct)
 		r = r.WithContext(ctx)
 
