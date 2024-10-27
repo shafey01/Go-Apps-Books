@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strconv"
@@ -35,14 +36,8 @@ func (p *Products) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 func (p *Products) AddProduct(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle Post Request")
-	NewProduct := &data.Product{}
-	err := NewProduct.FromJSON(r.Body)
-	if err != nil {
-		http.Error(w, "Unable to Decode data", http.StatusBadRequest)
-		return
-	}
-
-	data.AddProduct(NewProduct)
+	NewProduct := r.Context().Value(KeyProduct{}).(data.Product)
+	data.AddProduct(&NewProduct)
 }
 
 func (p *Products) UpdateProduct(w http.ResponseWriter, r *http.Request) {
@@ -54,14 +49,8 @@ func (p *Products) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.l.Println("Handle PUT Request")
-	NewProduct := &data.Product{}
-	err = NewProduct.FromJSON(r.Body)
-	if err != nil {
-		http.Error(w, "Unable to Decode data", http.StatusBadRequest)
-
-	}
-
-	err = data.UpdateProduct(id, NewProduct)
+	NewProduct := r.Context().Value(KeyProduct{}).(data.Product)
+	err = data.UpdateProduct(id, &NewProduct)
 	if err != nil {
 		http.Error(w, "Product Not Found", http.StatusInternalServerError)
 		return
@@ -74,4 +63,25 @@ func (p *Products) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 }
 func (p *Products) deleteProduct(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle delete Request")
+}
+
+// Key type for context
+type KeyProduct struct{}
+
+// Middleware function to validate the request and call the next handler
+func (p Products) ValidateMiddelwareProducts(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		NewProduct := data.Product{}
+		err := NewProduct.FromJSON(r.Body)
+		if err != nil {
+			p.l.Println("[ERROR] deserializing product", err)
+			http.Error(w, "Unable to Decode data", http.StatusBadRequest)
+			return
+		}
+		ctx := context.WithValue(r.Context(), KeyProduct{}, NewProduct)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
 }

@@ -26,10 +26,11 @@ func main() {
 
 	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.Use(ph.ValidateMiddelwareProducts)
 
 	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
-	// mux handler function
+	putRouter.Use(ph.ValidateMiddelwareProducts)
 
 	// server struct
 	server := &http.Server{
