@@ -32,6 +32,9 @@ func main() {
 	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
 	putRouter.Use(ph.ValidateMiddelwareProducts)
 
+	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/product/{id:[0-9]+}", ph.DeleteProduct)
+
 	// server struct
 	server := &http.Server{
 		Addr:         "0.0.0.0:8080",

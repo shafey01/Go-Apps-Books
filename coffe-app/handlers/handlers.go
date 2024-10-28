@@ -27,6 +27,13 @@ func (p *Products) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 	// fetch data from the database
 	listProduct := data.GetProducts()
+
+	if len(listProduct) == 0 {
+
+		p.l.Println("Handle Get Product Request: [ERROR] Empty List")
+		http.Error(w, "Empty List", http.StatusBadRequest)
+		return
+	}
 	err := listProduct.ToJSON(w)
 	if err != nil {
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
@@ -51,18 +58,39 @@ func (p *Products) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle PUT Request")
 	NewProduct := r.Context().Value(KeyProduct{}).(data.Product)
 	err = data.UpdateProduct(id, &NewProduct)
-	if err != nil {
-		http.Error(w, "Product Not Found", http.StatusInternalServerError)
-		return
-	}
 	if err == data.ErrProductNotFound {
-
+		p.l.Println("[ERORR] Product Not Found ")
 		http.Error(w, "Product Not Found", http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 }
-func (p *Products) deleteProduct(w http.ResponseWriter, r *http.Request) {
+func (p *Products) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+
+		http.Error(w, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
 	p.l.Println("Handle delete Request")
+	err = data.DelelteProduct(id)
+
+	if err == data.ErrProductNotFound {
+
+		p.l.Println("[ERORR] Product Not Found ")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if err == data.ErrEmptyList {
+
+		p.l.Println("[ERORR] Product Not Found ")
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 }
 
 // Key type for context

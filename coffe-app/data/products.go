@@ -22,6 +22,7 @@ type Product struct {
 }
 
 var ErrProductNotFound = fmt.Errorf("Product Not Found")
+var ErrEmptyList = fmt.Errorf("Empty List")
 
 // Decode data
 func (p *Product) FromJSON(r io.Reader) error {
@@ -69,24 +70,40 @@ func AddProduct(p *Product) {
 
 func UpdateProduct(id int, p *Product) error {
 
-	_, pos, err := findProduct(id)
+	pos := findProductByID(id)
 
-	if err != nil {
-		return err
+	if pos == -1 {
+		return ErrProductNotFound
 	}
 	p.ID = id
 	productList[pos] = p
 	return nil
 }
+func DelelteProduct(id int) error {
+
+	pos := findProductByID(id)
+	if pos == -1 {
+		return ErrProductNotFound
+
+	}
+	if len(productList) >= 1 {
+		productList = append(productList[:pos], productList[pos+1:]...)
+	}
+
+	if len(productList) == 0 {
+		return ErrEmptyList
+	}
+	return nil
+}
 
 // Utilits functions
-func findProduct(id int) (*Product, int, error) {
+func findProductByID(id int) int {
 	for i, v := range productList {
 		if v.ID == id {
-			return v, i, nil
+			return i
 		}
 	}
-	return nil, -1, ErrProductNotFound
+	return -1
 }
 
 func getNextId() int {
