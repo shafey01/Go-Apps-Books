@@ -79,29 +79,31 @@ func ListTasks(db *bolt.DB, completed bool) ([]*Task, error) {
 
 }
 
+func MarkTaskAsCompleted(db *bolt.DB, task *Task) error {
+	err := db.Update(func(tx *bolt.Tx) error {
+		t := tx.Bucket(tasksBucketName).Get(itob(task.ID))
+		if len(t) == 0 {
+			return fmt.Errorf("There is no task with this id: %v", task.ID)
+		}
+		if err := json.Unmarshal(t, task); err != nil {
+			exitf("%v", err)
+		}
+		task.Completed = true
+		taskMarshal, err := json.Marshal(task)
+		if err != nil {
+			exitf("%v", err)
+		}
+		err = tx.Bucket(tasksBucketName).Put(itob(task.ID), taskMarshal)
+		if err != nil {
+			return fmt.Errorf("could not mark Task: %v", err)
+		}
+		return nil
+	})
+	fmt.Println("Marked Task")
+	return err
+}
 func itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
 }
-
-// func CreateTask(task *Task) error {
-// 	return withDB(func(db *bolt.DB) error {
-// 		return db.Update(func(tx *bolt.Tx) error {
-// 			bucket := tx.Bucket(tasksBucketName)
-
-// 			id, err := bucket.NextSequence()
-// 			if err != nil {
-// 				return err
-// 			}
-// 			task.ID = int(id)
-
-// 			b, err := json.Marshal(&task)
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			return bucket.Put(itob(task.ID), b)
-// 		})
-// 	})
-// }
