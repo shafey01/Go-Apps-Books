@@ -102,6 +102,23 @@ func MarkTaskAsCompleted(db *bolt.DB, task *Task) error {
 	fmt.Println("Marked Task")
 	return err
 }
+
+func Delete(db *bolt.DB, task *Task) error {
+
+	return db.Update(func(tx *bolt.Tx) error {
+		t := tx.Bucket(tasksBucketName).Get(itob(task.ID))
+		if len(t) == 0 {
+			return fmt.Errorf("Task not found with ID=%d ", task.ID)
+		}
+		// if err := json.Unmarshal(t, task); err != nil {
+		// 	exitf("%v", err)
+		// }
+		return tx.Bucket(tasksBucketName).Delete(itob(task.ID))
+
+	})
+
+}
+
 func itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
