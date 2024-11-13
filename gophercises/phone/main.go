@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -29,12 +30,17 @@ func main() {
 	}
 	defer db.Close()
 	// stmt, err := db.Prepare("INSERT phone_number in phone_numbers values(?)")
+
+	//////////////////////////////////////////////////////////////////
 	sqlCreate := `CREATE TABLE IF NOT EXISTS phone_numbers (
         phone_number Text
         );`
 	sqlInsert := `INSERT INTO phone_numbers (phone_number)
                 VALUES (?);`
 	sqlDelete := `DELETE FROM phone_numbers`
+	sqlUpdate := `UPDATE phone_numbers SET phone_number = ? WHERE phone_number = ?`
+	// sqlDeleteRow := `DELETE FROM phone_numbers WHERE phone_number = ?`
+	//////////////////////////////////////////////////////////////////
 
 	if _, err := db.Exec(sqlCreate); err != nil {
 
@@ -57,7 +63,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("Original:")
+	// fmt.Println("Original:")
 	rows, err := db.Query("SELECT phone_number FROM phone_numbers")
 	if err != nil {
 		log.Fatalf("Failed to query statement: %v", err)
@@ -65,6 +71,49 @@ func main() {
 	defer rows.Close()
 
 	var phones []string
+
+	var formatedPhones []string
+	for rows.Next() {
+		var phone_number string
+		if err := rows.Scan(&phone_number); err != nil {
+
+			log.Fatalf("Failed to scan row: %v", err)
+		}
+
+		// fmt.Println(phone_number)
+		phones = append(phones, phone_number)
+		formatedPhones = append(formatedPhones, formatPhoneNumber(phone_number))
+	}
+	if err := rows.Err(); err != nil {
+
+		log.Fatalf("Failed to scan row: %v", err)
+
+	}
+
+	stmtupadate, err := db.Prepare(sqlUpdate)
+	if err != nil {
+		log.Fatalf("faild to prepare update statment %v", err)
+	}
+
+	// stmtDelete, err := db.Prepare(sqlDelete)
+	// if err != nil {
+	// 	log.Fatalf("Faild to prepare delete statment %v", err)
+	// }
+
+	for i, p := range phones {
+		fp := formatedPhones[i]
+		fmt.Println(fp)
+		if _, err := stmtupadate.Exec(fp, p); err != nil {
+
+			log.Fatalf("Faild to update record %v", err)
+		}
+	}
+	fmt.Println("Formated: ")
+	rows, err = db.Query("SELECT phone_number FROM phone_numbers")
+	if err != nil {
+		log.Fatalf("Failed to query statement: %v", err)
+	}
+	defer rows.Close()
 	for rows.Next() {
 		var phone_number string
 		if err := rows.Scan(&phone_number); err != nil {
@@ -73,6 +122,13 @@ func main() {
 		}
 
 		fmt.Println(phone_number)
-		phones = append(phones, phone_number)
 	}
+	// for _, p := range phones {
+	// 	f := formatPhoneNumber(p)
+	// 	fmt.Println(f)
+	// }
+}
+
+func formatPhoneNumber(phone_number string) string {
+	return regexp.MustCompile("[^\\d]").ReplaceAllString(phone_number, "")
 }
