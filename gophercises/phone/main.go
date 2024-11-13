@@ -39,7 +39,8 @@ func main() {
                 VALUES (?);`
 	sqlDelete := `DELETE FROM phone_numbers`
 	sqlUpdate := `UPDATE phone_numbers SET phone_number = ? WHERE phone_number = ?`
-	// sqlDeleteRow := `DELETE FROM phone_numbers WHERE phone_number = ?`
+	sqlDeleteRow := `DELETE FROM phone_numbers WHERE phone_number = ?`
+	sqlQuery := `SELECT 1 FROM phone_numbers WHERE phone_number = ? LIMIT 1`
 	//////////////////////////////////////////////////////////////////
 
 	if _, err := db.Exec(sqlCreate); err != nil {
@@ -95,14 +96,33 @@ func main() {
 		log.Fatalf("faild to prepare update statment %v", err)
 	}
 
-	// stmtDelete, err := db.Prepare(sqlDelete)
-	// if err != nil {
-	// 	log.Fatalf("Faild to prepare delete statment %v", err)
-	// }
+	stmtQuery, err := db.Prepare(sqlQuery)
+	if err != nil {
+		log.Fatalf("Faild to prepare Query statment %v", err)
+	}
+	stmtDelete, err := db.Prepare(sqlDeleteRow)
+	if err != nil {
+		log.Fatalf("Faild to prepare delete statment %v", err)
+	}
 
 	for i, p := range phones {
 		fp := formatedPhones[i]
-		fmt.Println(fp)
+		res, err := stmtQuery.Query(fp)
+		if err != nil {
+
+			log.Fatalf("Faild to Query record %v", err)
+		}
+
+		duplicate := res.Next()
+		res.Close()
+		if duplicate {
+			if _, err := stmtDelete.Exec(p); err != nil {
+
+				log.Fatalf("Faild to Delete record %v", err)
+			}
+			continue
+		}
+
 		if _, err := stmtupadate.Exec(fp, p); err != nil {
 
 			log.Fatalf("Faild to update record %v", err)
