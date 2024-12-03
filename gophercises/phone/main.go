@@ -104,7 +104,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Faild to prepare delete statment %v", err)
 	}
-
 	for i, p := range phones {
 		fp := formatedPhones[i]
 		res, err := stmtQuery.Query(fp)
